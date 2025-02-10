@@ -2,19 +2,30 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 import json
+import os
+
+# Debug: Print the current working directory to check file paths
+st.write("📂 Current Working Directory:", os.getcwd())
 
 # Load Data
 @st.cache_data
 def load_data():
-    with open(r"C:\Users\VYSHNAVI\desktop\APIEndpoint.json", "r") as file:
-        api_data = json.load(file)
-    with open(r"C:\Users\VYSHNAVI\desktop\QuizEndpoint.json", "r") as file:
-        quiz_data = json.load(file)
-    with open(r"C:\Users\VYSHNAVI\desktop\QuizSubmissionData.json", "r") as file:
-        submission_data = json.load(file)
-    return api_data, quiz_data, submission_data
+    try:
+        with open("APIEndpoint.json", "r") as file:
+            api_data = json.load(file)
+        with open("QuizEndpoint.json", "r") as file:
+            quiz_data = json.load(file)
+        with open("QuizSubmissionData.json", "r") as file:
+            submission_data = json.load(file)
+        return api_data, quiz_data, submission_data
+    except FileNotFoundError as e:
+        st.error(f"❌ File Not Found: {e.filename}. Make sure all JSON files are in the root folder.")
+        return None, None, None
 
 api_data, quiz_data, submission_data = load_data()
+
+if not api_data or not quiz_data or not submission_data:
+    st.stop()
 
 # Convert API Data to DataFrame
 df_api = pd.DataFrame(api_data)
